@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SimonWatch</string>
+    <string name="hello_round">Velkommen til SimonWatch!</string>
+    <string name="hello_square">Velkommen til SimonWatch!</string>
+    <string name="messages">Messages:</string>
+
+</resources>
