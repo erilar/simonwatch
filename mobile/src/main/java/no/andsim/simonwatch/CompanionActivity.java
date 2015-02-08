@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -14,6 +15,9 @@ import com.google.android.gms.common.data.FreezableUtils;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
@@ -131,8 +135,24 @@ public class CompanionActivity extends ActionBarActivity implements DataApi.Data
                 for (DataEvent event : events) {
                     if (event.getType() == DataEvent.TYPE_CHANGED) {
                         LOGD("TYPE CHANGE", ""+event.getType());
+                        // DataItem changed
+                        DataItem item = event.getDataItem();
+                        if (item.getUri().getPath().compareTo("/simwatch/get-message") == 0) {
+                            DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                            showMessage(dataMap.getString(TEXT_MESSAGE));
+                            sendMessageToWatch();
+                        }
                     }
                 }
+            }
+        });
+    }
+
+    private void showMessage(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((TextView) findViewById(R.id.message)).setText(message);
             }
         });
     }
@@ -145,17 +165,22 @@ public class CompanionActivity extends ActionBarActivity implements DataApi.Data
             return true;
         }
         if(id == R.id.action_say_hello) {
-            mGoogleApiClient.connect();
-            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/simwatchhello");
-            putDataMapRequest.getDataMap().putString(TEXT_MESSAGE, "Hei fra mobilen!" + count++);
-            PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
-            PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest);
+            sendMessageToWatch();
 
 
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void sendMessageToWatch() {
+        mGoogleApiClient.connect();
+        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/simwatch/send-message");
+        putDataMapRequest.getDataMap().putString(TEXT_MESSAGE, "Hei fra mobilen!" + count++);
+        PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
+        PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest);
+    }
+
     @Override //MessageListener
     public void onMessageReceived(final MessageEvent messageEvent) {
         LOGD(TAG, "onMessageReceived() A message from watch was received:" + messageEvent
