@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -172,8 +173,11 @@ public class CompanionActivity extends ActionBarActivity implements DataApi.Data
 
         return super.onOptionsItemSelected(item);
     }
+    public void onSendMessageToWatch(View view) {
+        sendMessageToWatch();
+    }
 
-    private void sendMessageToWatch() {
+    public void sendMessageToWatch() {
         mGoogleApiClient.connect();
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/simwatch/send-message");
         putDataMapRequest.getDataMap().putString(TEXT_MESSAGE, "Hei fra mobilen!" + count++);
