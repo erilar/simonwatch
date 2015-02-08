@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -162,9 +163,6 @@ public class CompanionActivity extends ActionBarActivity implements DataApi.Data
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            return true;
-        }
         if(id == R.id.action_say_hello) {
             sendMessageToWatch();
 
@@ -179,8 +177,9 @@ public class CompanionActivity extends ActionBarActivity implements DataApi.Data
 
     public void sendMessageToWatch() {
         mGoogleApiClient.connect();
+        String text = ((EditText) findViewById(R.id.messageText)).getText().toString();
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/simwatch/send-message");
-        putDataMapRequest.getDataMap().putString(TEXT_MESSAGE, "Hei fra mobilen!" + count++);
+        putDataMapRequest.getDataMap().putString(TEXT_MESSAGE, text);
         PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
         PendingResult<DataApi.DataItemResult> pendingResult = Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest);
     }
